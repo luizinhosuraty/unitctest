@@ -117,6 +117,20 @@ extern struct _unitctest_ctx _ctx;
 						    strerr);                   \
 		}                                                              \
 	}
+
+/*
+ * @name EXPECT_FALSE
+ * @brief Checks whether cond is false. Test continues even on fail.
+ * @param cond - condition to be tested
+ */
+#define EXPECT_FALSE(cond, strerr)                                             \
+	{                                                                      \
+		if (cond) {                                                    \
+			_UNITCTEST_TEST_FAILED_COND("EXPECT_FALSE", #cond,     \
+						    strerr);                   \
+		}                                                              \
+	}
+
 /*
  * @name EXPECT_EQ
  * @brief Checks whether lhs == rhs. Test continues even on fail.
