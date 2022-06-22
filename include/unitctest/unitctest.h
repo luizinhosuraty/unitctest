@@ -42,6 +42,30 @@ extern struct _unitctest_ctx _ctx;
  *  Logs & co
  * -----------------------------------------------------------------------------
  */
+#if (__STDC_VERSION__ >= 201112L)
+#define _UNITCTEST_LOG_FMT(x)                                                  \
+	_Generic((x),                                                          \
+	char: "%c",                                                            \
+	signed char: "%hhd",                                                   \
+	unsigned char: "%hhu",                                                 \
+	signed short: "%hd",                                                   \
+	unsigned short: "%hu",                                                 \
+	signed int: "%d",                                                      \
+	unsigned int: "%u",                                                    \
+	long int: "%ld",                                                       \
+	unsigned long int: "%lu",                                              \
+	long long int: "%lld",                                                 \
+	unsigned long long int: "%llu",                                        \
+	float: "%f",                                                           \
+	double: "%f",                                                          \
+	long double: "%Lf",                                                    \
+	char *: "%s",                                                          \
+	void *: "%p",                                                          \
+	default: "%p")
+#else
+#define _UNITCTEST_LOG_FMT(x) "%lld"
+#endif /* __STDC_VERSION__ >= 201112L */
+
 #define _UNITCTEST_LOG(...) fprintf(stdout, __VA_ARGS__);
 
 #define _UNITCTEST_LOG_ERR(...) fprintf(stderr, __VA_ARGS__);
@@ -71,10 +95,12 @@ extern struct _unitctest_ctx _ctx;
 #define _UNITCTEST_TEST_FAILED_INT(type, op, lhs, rhs, strerr)                 \
 	_UNITCTEST_TEST_FAILED()                                               \
 	if (_ctx.verbosity) {                                                  \
-		_UNITCTEST_LOG_ERR(                                            \
-			" %s:%d -> %s(%s) failed (%d %s %d) -> %s\n",          \
-			__FILE__, __LINE__, type, #lhs #op #rhs, lhs, #op,     \
-			rhs, strerr);                                          \
+		_UNITCTEST_LOG_ERR(" %s:%d -> ", __FILE__, __LINE__);          \
+		_UNITCTEST_LOG_ERR("%s(%s) failed (", type, #lhs #op #rhs);    \
+		_UNITCTEST_LOG_ERR(_UNITCTEST_LOG_FMT(lhs), lhs);              \
+		_UNITCTEST_LOG_ERR(" %s ", #op);                               \
+		_UNITCTEST_LOG_ERR(_UNITCTEST_LOG_FMT(rhs), rhs);              \
+		_UNITCTEST_LOG_ERR("\n");                                      \
 	}
 
 #define _UNITCTEST_TEST_FAILED_COND(type, cond, strerr)                        \
