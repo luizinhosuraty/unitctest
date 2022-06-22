@@ -17,6 +17,7 @@ test_depfiles = $(addprefix $(test_build_dir), $(targets:=.d))
 
 targets := skip_test\
 	   expect_true_success\
+	   expect_false_success\
 	   expect_int_success\
 	   assert_true_success\
 	   assert_int_success
