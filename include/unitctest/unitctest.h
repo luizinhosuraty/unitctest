@@ -197,6 +197,19 @@ extern struct _unitctest_ctx _ctx;
 	}
 
 /*
+ * @name ASSERT_FALSE
+ * @brief Checks whether cond is false. Stop current test if condition is not true
+ * @param cond - condition to be tested
+ */
+#define ASSERT_FALSE(cond, strerr)                                             \
+	{                                                                      \
+		if (cond) {                                                    \
+			_UNITCTEST_TEST_FAILED_COND("ASSERT_FALSE", #cond,     \
+						    strerr);                   \
+		}                                                              \
+	}
+
+/*
  * @name ASSERT_EQ
  * @brief Checks whether lhs == rhs. Stop current test if condition is not true
  * @param lhs - left hand-side operand

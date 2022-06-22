@@ -20,6 +20,7 @@ targets := skip_test\
 	   expect_false_success\
 	   expect_int_success\
 	   assert_true_success\
+	   assert_false_success\
 	   assert_int_success
 
 all : $(targets)
