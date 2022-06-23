@@ -73,14 +73,14 @@ extern struct _unitctest_ctx _ctx;
 #define _UNITCTEST_LOG_TAP(...) _UNITCTEST_LOG(__VA_ARGS__);
 
 #define _UNITCTEST_LOG_TAP_SUCCEED()                                           \
-	_UNITCTEST_LOG_TAP("ok %d - %s\n", _ctx.current_test->id,              \
-			   _ctx.current_test->desc);
+	_UNITCTEST_LOG_TAP("ok %d - %s | %s \n", _ctx.current_test->id,        \
+			   _ctx.current_test->name, _ctx.current_test->desc);
 #define _UNITCTEST_LOG_TAP_FAILED()                                            \
-	_UNITCTEST_LOG_TAP("not ok %d - %s\n", _ctx.current_test->id,          \
-			   _ctx.current_test->desc);
+	_UNITCTEST_LOG_TAP("not ok %d - %s | %s\n", _ctx.current_test->id,     \
+			   _ctx.current_test->name, _ctx.current_test->desc);
 #define _UNITCTEST_LOG_TAP_SKIPPED()                                           \
-	_UNITCTEST_LOG_TAP("ok %d - %s # SKIP\n", _ctx.current_test->id,       \
-			   _ctx.current_test->desc);
+	_UNITCTEST_LOG_TAP("ok %d - %s | %s # SKIP\n", _ctx.current_test->id,  \
+			   _ctx.current_test->name, _ctx.current_test->desc);
 
 /* -----------------------------------------------------------------------------
  *  Asserts and Expects
