@@ -328,8 +328,58 @@ extern struct _unitctest_ctx _ctx;
 	}                                                                      \
 	void _unitctest_##tname(void)
 
-/* TODO: Group/Fixture of tests*/
-/* #define TEST_G(tgroup, tname, tdesc) */
+/*
+ * @name TEST_FIXTURE
+ * @brief Defines a fixture and the struct that will be shared/available
+ * @param tfixture - single string containing the fixture name
+ */
+#define TEST_FIXTURE(tfixture, tfixturestruct)                                 \
+	typedef struct tfixturestruct _type_##tfixture;
+/*
+ * @name TEST_F_SETUP
+ * @brief Defines a fixture setup that will be called before each test
+ * @param tfixture - single string containing the fixture name
+ */
+#define TEST_F_SETUP(tfixture)                                                 \
+	static void _unitctest_##tfixture##_setup(_type_##tfixture *);         \
+	static void _unitctest_##tfixture##_setup(_type_##tfixture *tfixture)
+/*
+ * @name TEST_F_TEARDOWN
+ * @brief Defines a fixture teardown that will be called after each test
+ * @param tfixture - single string containing the fixture name
+ */
+#define TEST_F_TEARDOWN(tfixture)                                              \
+	static void _unitctest_##tfixture##_teardown(_type_##tfixture *);      \
+	static void _unitctest_##tfixture##_teardown(_type_##tfixture *tfixture)
+/*
+ * @name TEST_F
+ * @brief Defines a test with a fixture
+ * @param tfixture - single string containing the fixture name
+ * @param tname - single string containing the name of the test
+ * @param tdesc - string containing the description of the test (printed on TAP)
+ */
+#define TEST_F(tfixture, tname, tdesc)                                         \
+	static void _unitctest_##tname##_##tfixture(_type_##tfixture *);       \
+	static void _unitctest_##tfixture##_##tname(void)                      \
+	{                                                                      \
+		_type_##tfixture _var_##tfixture;                              \
+		_unitctest_##tfixture##_setup(&_var_##tfixture);               \
+		if (_ctx.current_test->result != TEST_SUCCEED)                 \
+			return;                                                \
+		_unitctest_##tname##_##tfixture(&_var_##tfixture);             \
+		_unitctest_##tfixture##_teardown(&_var_##tfixture);            \
+	}                                                                      \
+	_UNITCTEST_TEST_REGISTER(_unitctest_register_##tfixture##_##tname)     \
+	{                                                                      \
+		const unsigned int i = _ctx.nbr++;                             \
+		_UNITCTEST_TEST_REALLOC();                                     \
+		_ctx.tests[i].id = i + 1;                                      \
+		_ctx.tests[i].result = TEST_SUCCEED;                           \
+		_ctx.tests[i].name = #tfixture "_" #tname;                     \
+		_ctx.tests[i].desc = tdesc;                                    \
+		_ctx.tests[i].func = &_unitctest_##tfixture##_##tname;         \
+	}                                                                      \
+	void _unitctest_##tname##_##tfixture(_type_##tfixture *tfixture)
 
 /*
  * @name TEST_SKIP
