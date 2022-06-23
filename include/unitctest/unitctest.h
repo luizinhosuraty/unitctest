@@ -100,6 +100,7 @@ extern struct _unitctest_ctx _ctx;
 		_UNITCTEST_LOG_ERR(_UNITCTEST_LOG_FMT(lhs), lhs);              \
 		_UNITCTEST_LOG_ERR(" %s ", #op);                               \
 		_UNITCTEST_LOG_ERR(_UNITCTEST_LOG_FMT(rhs), rhs);              \
+		_UNITCTEST_LOG_ERR(") -> %s", strerr);                         \
 		_UNITCTEST_LOG_ERR("\n");                                      \
 	}
 
