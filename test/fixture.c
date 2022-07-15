@@ -1,3 +1,10 @@
+/* fixture.c - Test TEST_FIXTURE, TEST_F_{SETUP,TEARDOWN} and TEST_F
+ *
+ * Copyright (c) 2022 Luiz Henrique Suraty Filho <luiz-dev@suraty.com>
+ * 
+ * SPDX-License-Identifier: MIT
+ *
+ */
 #include "unitctest/unitctest.h"
 
 struct mysharedstruct {
