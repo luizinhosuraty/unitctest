@@ -20,33 +20,33 @@
  * -----------------------------------------------------------------------------
  */
 
-typedef void (*_unitctest_func_t)(void);
+typedef void (*__unitctest_func_t)(void);
 
-enum _unitctest_test_result { TEST_SUCCEED, TEST_FAILED, TEST_SKIPPED };
+enum __unitctest_test_result { TEST_SUCCEED, TEST_FAILED, TEST_SKIPPED };
 
-struct _unitctest_test {
+struct __unitctest_test {
 	unsigned int id;
-	enum _unitctest_test_result result;
+	enum __unitctest_test_result result;
 	const char *name;
 	const char *desc;
-	_unitctest_func_t func;
+	__unitctest_func_t func;
 };
 
-struct _unitctest_ctx {
+struct __unitctest_ctx {
 	unsigned int nbr;
 	unsigned int verbosity;
-	struct _unitctest_test *tests;
-	struct _unitctest_test *current_test;
+	struct __unitctest_test *tests;
+	struct __unitctest_test *current_test;
 };
 
-extern struct _unitctest_ctx _ctx;
+extern struct __unitctest_ctx __ctx;
 
 /* -----------------------------------------------------------------------------
  *  Logs & co
  * -----------------------------------------------------------------------------
  */
 #if (__STDC_VERSION__ >= 201112L)
-#define _UNITCTEST_LOG_FMT(x)                                                  \
+#define __UNITCTEST_LOG_FMT(x)                                                 \
 	_Generic((x),                                                          \
 	char: "%c",                                                            \
 	signed char: "%hhd",                                                   \
@@ -66,72 +66,75 @@ extern struct _unitctest_ctx _ctx;
 	void *: "%p",                                                          \
 	default: "%p")
 #else
-#define _UNITCTEST_LOG_FMT(x) "%lld"
+#define __UNITCTEST_LOG_FMT(x) "%lld"
 #endif /* __STDC_VERSION__ >= 201112L */
 
-#define _UNITCTEST_LOG(...) fprintf(stdout, __VA_ARGS__);
+#define __UNITCTEST_LOG(...) fprintf(stdout, __VA_ARGS__);
 
-#define _UNITCTEST_LOG_ERR(...) fprintf(stderr, __VA_ARGS__);
+#define __UNITCTEST_LOG_ERR(...) fprintf(stderr, __VA_ARGS__);
 
-#define _UNITCTEST_LOG_TAP(...) _UNITCTEST_LOG(__VA_ARGS__);
+#define __UNITCTEST_LOG_TAP(...) __UNITCTEST_LOG(__VA_ARGS__);
 
-#define _UNITCTEST_LOG_TAP_SUCCEED()                                           \
-	_UNITCTEST_LOG_TAP("ok %d - %s | %s \n", _ctx.current_test->id,        \
-			   _ctx.current_test->name, _ctx.current_test->desc);
-#define _UNITCTEST_LOG_TAP_FAILED()                                            \
-	_UNITCTEST_LOG_TAP("not ok %d - %s | %s\n", _ctx.current_test->id,     \
-			   _ctx.current_test->name, _ctx.current_test->desc);
-#define _UNITCTEST_LOG_TAP_SKIPPED()                                           \
-	_UNITCTEST_LOG_TAP("ok %d - %s | %s # SKIP\n", _ctx.current_test->id,  \
-			   _ctx.current_test->name, _ctx.current_test->desc);
+#define __UNITCTEST_LOG_TAP_SUCCEED()                                          \
+	__UNITCTEST_LOG_TAP("ok %d - %s | %s \n", __ctx.current_test->id,      \
+			    __ctx.current_test->name,                          \
+			    __ctx.current_test->desc);
+#define __UNITCTEST_LOG_TAP_FAILED()                                           \
+	__UNITCTEST_LOG_TAP("not ok %d - %s | %s\n", __ctx.current_test->id,   \
+			    __ctx.current_test->name,                          \
+			    __ctx.current_test->desc);
+#define __UNITCTEST_LOG_TAP_SKIPPED()                                          \
+	__UNITCTEST_LOG_TAP("ok %d - %s | %s # SKIP\n",                        \
+			    __ctx.current_test->id, __ctx.current_test->name,  \
+			    __ctx.current_test->desc);
 
 /* -----------------------------------------------------------------------------
  *  Asserts and Expects
  * -----------------------------------------------------------------------------
  */
-#define _UNITCTEST_TEST_FAILED()                                               \
-	if (_ctx.current_test->result == TEST_SUCCEED) {                       \
-		_UNITCTEST_LOG_TAP_FAILED();                                   \
-		_ctx.current_test->result = TEST_FAILED;                       \
+#define __UNITCTEST_TEST_FAILED()                                              \
+	if (__ctx.current_test->result == TEST_SUCCEED) {                      \
+		__UNITCTEST_LOG_TAP_FAILED();                                  \
+		__ctx.current_test->result = TEST_FAILED;                      \
 	}
 
-#define _UNITCTEST_TEST_FAILED_INT(type, op, lhs, rhs, strerr)                 \
-	_UNITCTEST_TEST_FAILED()                                               \
-	if (_ctx.verbosity) {                                                  \
-		_UNITCTEST_LOG_ERR(" %s:%d -> ", __FILE__, __LINE__);          \
-		_UNITCTEST_LOG_ERR("%s(%s) failed (", type, #lhs #op #rhs);    \
-		_UNITCTEST_LOG_ERR(_UNITCTEST_LOG_FMT(lhs), lhs);              \
-		_UNITCTEST_LOG_ERR(" %s ", #op);                               \
-		_UNITCTEST_LOG_ERR(_UNITCTEST_LOG_FMT(rhs), rhs);              \
-		_UNITCTEST_LOG_ERR(") -> %s", strerr);                         \
-		_UNITCTEST_LOG_ERR("\n");                                      \
+#define __UNITCTEST_TEST_FAILED_INT(type, op, lhs, rhs, strerr)                \
+	__UNITCTEST_TEST_FAILED()                                              \
+	if (__ctx.verbosity) {                                                 \
+		__UNITCTEST_LOG_ERR(" %s:%d -> ", __FILE__, __LINE__);         \
+		__UNITCTEST_LOG_ERR("%s(%s) failed (", type, #lhs #op #rhs);   \
+		__UNITCTEST_LOG_ERR(__UNITCTEST_LOG_FMT(lhs), lhs);            \
+		__UNITCTEST_LOG_ERR(" %s ", #op);                              \
+		__UNITCTEST_LOG_ERR(__UNITCTEST_LOG_FMT(rhs), rhs);            \
+		__UNITCTEST_LOG_ERR(") -> %s", strerr);                        \
+		__UNITCTEST_LOG_ERR("\n");                                     \
 	}
 
-#define _UNITCTEST_TEST_FAILED_COND(type, cond, strerr)                        \
-	_UNITCTEST_TEST_FAILED()                                               \
-	if (_ctx.verbosity) {                                                  \
-		_UNITCTEST_LOG_ERR(" %s:%d -> %s(%s) failed -> %s\n",          \
-				   __FILE__, __LINE__, type, cond, strerr);    \
+#define __UNITCTEST_TEST_FAILED_COND(type, cond, strerr)                       \
+	__UNITCTEST_TEST_FAILED()                                              \
+	if (__ctx.verbosity) {                                                 \
+		__UNITCTEST_LOG_ERR(" %s:%d -> %s(%s) failed -> %s\n",         \
+				    __FILE__, __LINE__, type, cond, strerr);   \
 	}
 
-#define _UNITCTEST_ASSERT_HELPER_INT(strop, op, lhs, rhs, strerr)              \
+#define __UNITCTEST_ASSERT_HELPER_INT(strop, op, lhs, rhs, strerr)             \
 	{                                                                      \
 		typeof(lhs) _lhs = lhs;                                        \
 		typeof(rhs) _rhs = rhs;                                        \
 		if (!(_lhs op _rhs)) {                                         \
-			_UNITCTEST_TEST_FAILED_INT("ASSERT_" strop, op, lhs,   \
-						   rhs, strerr);               \
+			__UNITCTEST_TEST_FAILED_INT("ASSERT_" strop, op, lhs,  \
+						    rhs, strerr);              \
 			return;                                                \
 		}                                                              \
 	}
 
-#define _UNITCTEST_EXPECT_HELPER_INT(strop, op, lhs, rhs, strerr)              \
+#define __UNITCTEST_EXPECT_HELPER_INT(strop, op, lhs, rhs, strerr)             \
 	{                                                                      \
 		typeof(lhs) _lhs = lhs;                                        \
 		typeof(rhs) _rhs = rhs;                                        \
 		if (!(_lhs op _rhs)) {                                         \
-			_UNITCTEST_TEST_FAILED_INT("EXPECT_" strop, op, lhs,   \
-						   rhs, strerr);               \
+			__UNITCTEST_TEST_FAILED_INT("EXPECT_" strop, op, lhs,  \
+						    rhs, strerr);              \
 		}                                                              \
 	}
 
@@ -143,8 +146,8 @@ extern struct _unitctest_ctx _ctx;
 #define EXPECT_TRUE(cond, strerr)                                              \
 	{                                                                      \
 		if (!(cond)) {                                                 \
-			_UNITCTEST_TEST_FAILED_COND("EXPECT_TRUE", #cond,      \
-						    strerr);                   \
+			__UNITCTEST_TEST_FAILED_COND("EXPECT_TRUE", #cond,     \
+						     strerr);                  \
 		}                                                              \
 	}
 
@@ -156,8 +159,8 @@ extern struct _unitctest_ctx _ctx;
 #define EXPECT_FALSE(cond, strerr)                                             \
 	{                                                                      \
 		if (cond) {                                                    \
-			_UNITCTEST_TEST_FAILED_COND("EXPECT_FALSE", #cond,     \
-						    strerr);                   \
+			__UNITCTEST_TEST_FAILED_COND("EXPECT_FALSE", #cond,    \
+						     strerr);                  \
 		}                                                              \
 	}
 
@@ -168,7 +171,7 @@ extern struct _unitctest_ctx _ctx;
  * @param rhs - right hand-side operand
  */
 #define EXPECT_EQ(lhs, rhs, strerr)                                            \
-	_UNITCTEST_EXPECT_HELPER_INT("EQ", ==, lhs, rhs, strerr)
+	__UNITCTEST_EXPECT_HELPER_INT("EQ", ==, lhs, rhs, strerr)
 
 /*
  * @name EXPECT_NEQ
@@ -177,7 +180,7 @@ extern struct _unitctest_ctx _ctx;
  * @param rhs - right hand-side operand
  */
 #define EXPECT_NEQ(lhs, rhs, strerr)                                           \
-	_UNITCTEST_EXPECT_HELPER_INT("NEQ", !=, lhs, rhs, strerr)
+	__UNITCTEST_EXPECT_HELPER_INT("NEQ", !=, lhs, rhs, strerr)
 
 /*
  * @name EXPECT_NEQ
@@ -186,7 +189,7 @@ extern struct _unitctest_ctx _ctx;
  * @param rhs - right hand-side operand
  */
 #define EXPECT_GT(lhs, rhs, strerr)                                            \
-	_UNITCTEST_EXPECT_HELPER_INT("GT", >, lhs, rhs, strerr)
+	__UNITCTEST_EXPECT_HELPER_INT("GT", >, lhs, rhs, strerr)
 /*
  * @name EXPECT_GE
  * @brief Checks whether lhs >= rhs. Test continues even on fail.
@@ -194,7 +197,7 @@ extern struct _unitctest_ctx _ctx;
  * @param rhs - right hand-side operand
  */
 #define EXPECT_GE(lhs, rhs, strerr)                                            \
-	_UNITCTEST_EXPECT_HELPER_INT("GE", >=, lhs, rhs, strerr)
+	__UNITCTEST_EXPECT_HELPER_INT("GE", >=, lhs, rhs, strerr)
 /*
  * @name EXPECT_LT
  * @brief Checks whether lhs < rhs. Test continues even on fail.
@@ -202,7 +205,7 @@ extern struct _unitctest_ctx _ctx;
  * @param rhs - right hand-side operand
  */
 #define EXPECT_LT(lhs, rhs, strerr)                                            \
-	_UNITCTEST_EXPECT_HELPER_INT("LT", <, lhs, rhs, strerr)
+	__UNITCTEST_EXPECT_HELPER_INT("LT", <, lhs, rhs, strerr)
 
 /*
  * @name EXPECT_LE
@@ -211,7 +214,7 @@ extern struct _unitctest_ctx _ctx;
  * @param rhs - right hand-side operand
  */
 #define EXPECT_LE(lhs, rhs, strerr)                                            \
-	_UNITCTEST_EXPECT_HELPER_INT("LE", <=, lhs, rhs, strerr)
+	__UNITCTEST_EXPECT_HELPER_INT("LE", <=, lhs, rhs, strerr)
 
 /*
  * @name ASSERT_TRUE
@@ -221,8 +224,8 @@ extern struct _unitctest_ctx _ctx;
 #define ASSERT_TRUE(cond, strerr)                                              \
 	{                                                                      \
 		if (!(cond)) {                                                 \
-			_UNITCTEST_TEST_FAILED_COND("ASSERT_TRUE", #cond,      \
-						    strerr);                   \
+			__UNITCTEST_TEST_FAILED_COND("ASSERT_TRUE", #cond,     \
+						     strerr);                  \
 		}                                                              \
 	}
 
@@ -234,8 +237,8 @@ extern struct _unitctest_ctx _ctx;
 #define ASSERT_FALSE(cond, strerr)                                             \
 	{                                                                      \
 		if (cond) {                                                    \
-			_UNITCTEST_TEST_FAILED_COND("ASSERT_FALSE", #cond,     \
-						    strerr);                   \
+			__UNITCTEST_TEST_FAILED_COND("ASSERT_FALSE", #cond,    \
+						     strerr);                  \
 		}                                                              \
 	}
 
@@ -246,7 +249,7 @@ extern struct _unitctest_ctx _ctx;
  * @param rhs - right hand-side operand
  */
 #define ASSERT_EQ(lhs, rhs, strerr)                                            \
-	_UNITCTEST_ASSERT_HELPER_INT("EQ", ==, lhs, rhs, strerr)
+	__UNITCTEST_ASSERT_HELPER_INT("EQ", ==, lhs, rhs, strerr)
 
 /*
  * @name ASSERT_NEQ
@@ -255,7 +258,7 @@ extern struct _unitctest_ctx _ctx;
  * @param rhs - right hand-side operand
  */
 #define ASSERT_NEQ(lhs, rhs, strerr)                                           \
-	_UNITCTEST_ASSERT_HELPER_INT("NEQ", !=, lhs, rhs, strerr)
+	__UNITCTEST_ASSERT_HELPER_INT("NEQ", !=, lhs, rhs, strerr)
 /*
  * @name ASSERT_GT
  * @brief Checks whether lhs > rhs. Stop current test if condition is not true
@@ -263,7 +266,7 @@ extern struct _unitctest_ctx _ctx;
  * @param rhs - right hand-side operand
  */
 #define ASSERT_GT(lhs, rhs, strerr)                                            \
-	_UNITCTEST_ASSERT_HELPER_INT("GT", >, lhs, rhs, strerr)
+	__UNITCTEST_ASSERT_HELPER_INT("GT", >, lhs, rhs, strerr)
 
 /*
  * @name ASSERT_GE
@@ -272,7 +275,7 @@ extern struct _unitctest_ctx _ctx;
  * @param rhs - right hand-side operand
  */
 #define ASSERT_GE(lhs, rhs, strerr)                                            \
-	_UNITCTEST_ASSERT_HELPER_INT("GE", >=, lhs, rhs, strerr)
+	__UNITCTEST_ASSERT_HELPER_INT("GE", >=, lhs, rhs, strerr)
 
 /*
  * @name ASSERT_LT
@@ -281,7 +284,7 @@ extern struct _unitctest_ctx _ctx;
  * @param rhs - right hand-side operand
  */
 #define ASSERT_LT(lhs, rhs, strerr)                                            \
-	_UNITCTEST_ASSERT_HELPER_INT("LT", <, lhs, rhs, strerr)
+	__UNITCTEST_ASSERT_HELPER_INT("LT", <, lhs, rhs, strerr)
 
 /*
  * @name ASSERT_LE
@@ -290,7 +293,7 @@ extern struct _unitctest_ctx _ctx;
  * @param rhs - right hand-side operand
  */
 #define ASSERT_LE(lhs, rhs, strerr)                                            \
-	_UNITCTEST_ASSERT_HELPER_INT("LE", <=, lhs, rhs, strerr)
+	__UNITCTEST_ASSERT_HELPER_INT("LE", <=, lhs, rhs, strerr)
 
 /* -----------------------------------------------------------------------------
  *  Test Definition
@@ -300,15 +303,15 @@ extern struct _unitctest_ctx _ctx;
 /*
  * __attribute__((constructor)) causes this function to be called before main
  */
-#define _UNITCTEST_TEST_REGISTER(f)                                            \
+#define __UNITCTEST_TEST_REGISTER(f)                                           \
 	static void f(void) __attribute__((constructor));                      \
 	static void f(void)
 
-#define _UNITCTEST_TEST_REALLOC()                                              \
-	_ctx.tests = (struct _unitctest_test *)realloc(                        \
-		_ctx.tests, sizeof(struct _unitctest_test) * _ctx.nbr);        \
-	if (_ctx.tests == NULL) {                                              \
-		_UNITCTEST_LOG_ERR("Failed to realloc context\n");             \
+#define __UNITCTEST_TEST_REALLOC()                                             \
+	__ctx.tests = (struct __unitctest_test *)realloc(                      \
+		__ctx.tests, sizeof(struct __unitctest_test) * __ctx.nbr);     \
+	if (__ctx.tests == NULL) {                                             \
+		__UNITCTEST_LOG_ERR("Failed to realloc context\n");            \
 		abort();                                                       \
 	}
 /*
@@ -318,18 +321,18 @@ extern struct _unitctest_ctx _ctx;
  * @param tdesc - string containing the description of the test (printed on TAP)
  */
 #define TEST(tname, tdesc)                                                     \
-	static void _unitctest_##tname(void);                                  \
-	_UNITCTEST_TEST_REGISTER(_unitctest_register_##tname)                  \
+	static void __unitctest_##tname(void);                                 \
+	__UNITCTEST_TEST_REGISTER(__unitctest_register_##tname)                \
 	{                                                                      \
-		const unsigned int i = _ctx.nbr++;                             \
-		_UNITCTEST_TEST_REALLOC();                                     \
-		_ctx.tests[i].id = i + 1;                                      \
-		_ctx.tests[i].result = TEST_SUCCEED;                           \
-		_ctx.tests[i].name = #tname;                                   \
-		_ctx.tests[i].desc = tdesc;                                    \
-		_ctx.tests[i].func = &_unitctest_##tname;                      \
+		const unsigned int i = __ctx.nbr++;                            \
+		__UNITCTEST_TEST_REALLOC();                                    \
+		__ctx.tests[i].id = i + 1;                                     \
+		__ctx.tests[i].result = TEST_SUCCEED;                          \
+		__ctx.tests[i].name = #tname;                                  \
+		__ctx.tests[i].desc = tdesc;                                   \
+		__ctx.tests[i].func = &__unitctest_##tname;                    \
 	}                                                                      \
-	void _unitctest_##tname(void)
+	void __unitctest_##tname(void)
 
 /*
  * @name TEST_FIXTURE
@@ -344,16 +347,17 @@ extern struct _unitctest_ctx _ctx;
  * @param tfixture - single string containing the fixture name
  */
 #define TEST_F_SETUP(tfixture)                                                 \
-	static void _unitctest_##tfixture##_setup(_type_##tfixture *);         \
-	static void _unitctest_##tfixture##_setup(_type_##tfixture *tfixture)
+	static void __unitctest_##tfixture##_setup(_type_##tfixture *);        \
+	static void __unitctest_##tfixture##_setup(_type_##tfixture *tfixture)
 /*
  * @name TEST_F_TEARDOWN
  * @brief Defines a fixture teardown that will be called after each test
  * @param tfixture - single string containing the fixture name
  */
 #define TEST_F_TEARDOWN(tfixture)                                              \
-	static void _unitctest_##tfixture##_teardown(_type_##tfixture *);      \
-	static void _unitctest_##tfixture##_teardown(_type_##tfixture *tfixture)
+	static void __unitctest_##tfixture##_teardown(_type_##tfixture *);     \
+	static void __unitctest_##tfixture##_teardown(                         \
+		_type_##tfixture *tfixture)
 /*
  * @name TEST_F
  * @brief Defines a test with a fixture
@@ -362,61 +366,61 @@ extern struct _unitctest_ctx _ctx;
  * @param tdesc - string containing the description of the test (printed on TAP)
  */
 #define TEST_F(tfixture, tname, tdesc)                                         \
-	static void _unitctest_##tname##_##tfixture(_type_##tfixture *);       \
-	static void _unitctest_##tfixture##_##tname(void)                      \
+	static void __unitctest_##tname##_##tfixture(_type_##tfixture *);      \
+	static void __unitctest_##tfixture##_##tname(void)                     \
 	{                                                                      \
 		_type_##tfixture _var_##tfixture;                              \
-		_unitctest_##tfixture##_setup(&_var_##tfixture);               \
-		if (_ctx.current_test->result != TEST_SUCCEED)                 \
+		__unitctest_##tfixture##_setup(&_var_##tfixture);              \
+		if (__ctx.current_test->result != TEST_SUCCEED)                \
 			return;                                                \
-		_unitctest_##tname##_##tfixture(&_var_##tfixture);             \
-		_unitctest_##tfixture##_teardown(&_var_##tfixture);            \
+		__unitctest_##tname##_##tfixture(&_var_##tfixture);            \
+		__unitctest_##tfixture##_teardown(&_var_##tfixture);           \
 	}                                                                      \
-	_UNITCTEST_TEST_REGISTER(_unitctest_register_##tfixture##_##tname)     \
+	__UNITCTEST_TEST_REGISTER(__unitctest_register_##tfixture##_##tname)   \
 	{                                                                      \
-		const unsigned int i = _ctx.nbr++;                             \
-		_UNITCTEST_TEST_REALLOC();                                     \
-		_ctx.tests[i].id = i + 1;                                      \
-		_ctx.tests[i].result = TEST_SUCCEED;                           \
-		_ctx.tests[i].name = #tfixture "_" #tname;                     \
-		_ctx.tests[i].desc = tdesc;                                    \
-		_ctx.tests[i].func = &_unitctest_##tfixture##_##tname;         \
+		const unsigned int i = __ctx.nbr++;                            \
+		__UNITCTEST_TEST_REALLOC();                                    \
+		__ctx.tests[i].id = i + 1;                                     \
+		__ctx.tests[i].result = TEST_SUCCEED;                          \
+		__ctx.tests[i].name = #tfixture "_" #tname;                    \
+		__ctx.tests[i].desc = tdesc;                                   \
+		__ctx.tests[i].func = &__unitctest_##tfixture##_##tname;       \
 	}                                                                      \
-	void _unitctest_##tname##_##tfixture(_type_##tfixture *tfixture)
+	void __unitctest_##tname##_##tfixture(_type_##tfixture *tfixture)
 
 /*
  * @name TEST_SKIP
  * @brief Set current test as skipped
  */
-#define TEST_SKIP() _ctx.current_test->result = TEST_SKIPPED;
+#define TEST_SKIP() __ctx.current_test->result = TEST_SKIPPED;
 
 /*
  * @name TEST_HAS_FAILED
  * @brief Verify whether test has failed or not. To be used inside a test.
  */
-#define TEST_HAS_FAILED() (_ctx.current_test->result == TEST_FAILED);
+#define TEST_HAS_FAILED() (__ctx.current_test->result == TEST_FAILED);
 
 /*
  * @name TEST_VERBOSE_MODE
  * @brief Verify whether program is running in verbose mode
  */
-#define TEST_VERBOSE_MODE() (_ctx.verbosity)
+#define TEST_VERBOSE_MODE() (__ctx.verbosity)
 
 /* -----------------------------------------------------------------------------
  *  Functions to be perform tests
  * -----------------------------------------------------------------------------
  */
-static inline void _unitctest_log_result(void)
+static inline void __unitctest_log_result(void)
 {
-	switch (_ctx.current_test->result) {
+	switch (__ctx.current_test->result) {
 	case TEST_SUCCEED:
-		_UNITCTEST_LOG_TAP_SUCCEED();
+		__UNITCTEST_LOG_TAP_SUCCEED();
 		break;
 	case TEST_FAILED:
 		/* TAP log occurs during failed expect/assert */
 		break;
 	case TEST_SKIPPED:
-		_UNITCTEST_LOG_TAP_SKIPPED();
+		__UNITCTEST_LOG_TAP_SKIPPED();
 		break;
 	default:
 		fprintf(stderr, "Unknown error\n");
@@ -424,7 +428,7 @@ static inline void _unitctest_log_result(void)
 	}
 }
 
-static int _unitctest_init(int argc, char **argv)
+static int __unitctest_init(int argc, char **argv)
 {
 	(void)argc;
 	(void)argv;
@@ -433,39 +437,39 @@ static int _unitctest_init(int argc, char **argv)
 	while ((op = getopt(argc, argv, "v")) != -1) {
 		switch (op) {
 		case 'v':
-			_ctx.verbosity = 1;
+			__ctx.verbosity = 1;
 			break;
 		default:
 			abort();
 		}
 	}
-	_UNITCTEST_LOG_TAP("1..%d\n", _ctx.nbr);
+	__UNITCTEST_LOG_TAP("1..%d\n", __ctx.nbr);
 	return 0;
 }
 
-static int _unitctest_run(void)
+static int __unitctest_run(void)
 {
-	for (unsigned int i = 0; i < _ctx.nbr; i++) {
-		_ctx.current_test = &_ctx.tests[i];
-		_ctx.current_test->func();
-		_unitctest_log_result();
+	for (unsigned int i = 0; i < __ctx.nbr; i++) {
+		__ctx.current_test = &__ctx.tests[i];
+		__ctx.current_test->func();
+		__unitctest_log_result();
 	}
 	return 0;
 }
 
-static int _unitctest_fini(void)
+static int __unitctest_fini(void)
 {
-	free(_ctx.tests);
+	free(__ctx.tests);
 	return 0;
 }
 
 #define TEST_MAIN()                                                            \
-	struct _unitctest_ctx _ctx = { 0, 0, NULL, NULL };                     \
+	struct __unitctest_ctx __ctx = { 0, 0, NULL, NULL };                   \
 	int main(int argc, char **argv)                                        \
 	{                                                                      \
-		_unitctest_init(argc, argv);                                   \
-		_unitctest_run();                                              \
-		_unitctest_fini();                                             \
+		__unitctest_init(argc, argv);                                  \
+		__unitctest_run();                                             \
+		__unitctest_fini();                                            \
 	}
 
 #endif /* _UNITCTEST_H */
