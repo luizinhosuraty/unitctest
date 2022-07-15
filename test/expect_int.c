@@ -1,3 +1,10 @@
+/* expect_int.c - Test EXPECT_{EQ, NEQ, GT, GE} for int types
+ *
+ * Copyright (c) 2022 Luiz Henrique Suraty Filho <luiz-dev@suraty.com>
+ * 
+ * SPDX-License-Identifier: MIT
+ *
+ */
 #include "unitctest/unitctest.h"
 
 TEST(expect_eq, "Test EXPECT_EQ behavior for integral type")
