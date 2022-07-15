@@ -1,12 +1,15 @@
 /* unitctest.h
  *
- * A Tiny, Header-only Unit Test Framework for C/C++
+ * A Tiny, Header-only Unit Test Framework for C (and C++)
  *
  * Copyright (c) 2022 Luiz Henrique Suraty Filho <luiz-dev@suraty.com>
  * 
  * SPDX-License-Identifier: MIT
  *
  */
+
+#ifndef _UNITCTEST_H
+#define _UNITCTEST_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -464,3 +467,5 @@ static int _unitctest_fini(void)
 		_unitctest_run();                                              \
 		_unitctest_fini();                                             \
 	}
+
+#endif /* _UNITCTEST_H */
