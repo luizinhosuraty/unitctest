@@ -407,7 +407,7 @@ extern struct __unitctest_ctx __ctx;
 #define TEST_VERBOSE_MODE() (__ctx.verbosity)
 
 /* -----------------------------------------------------------------------------
- *  Functions to be perform tests
+ *  Functions to control/run the test suite
  * -----------------------------------------------------------------------------
  */
 static inline void __unitctest_log_result(void)
