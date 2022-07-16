@@ -66,7 +66,8 @@ extern struct __unitctest_ctx __ctx;
 	void *: "%p",                                                          \
 	default: "%p")
 #else
-#define __UNITCTEST_LOG_FMT(x) "%lld"
+#define __UNITCTEST_LOG_FMT(x) "%d"
+#define typeof __typeof__
 #endif /* __STDC_VERSION__ >= 201112L */
 
 #define __UNITCTEST_LOG(...) fprintf(stdout, __VA_ARGS__);
