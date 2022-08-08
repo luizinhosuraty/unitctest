@@ -11,9 +11,15 @@
 #ifndef _UNITCTEST_H
 #define _UNITCTEST_H
 
+#ifdef __cplusplus
+#include <iostream>
+#include <cstdio>
+#else /* __cplusplus */
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#endif /* __cplusplus */
+
+#include <getopt.h>
 
 /* -----------------------------------------------------------------------------
  *  Internal private structs and variables
@@ -45,7 +51,18 @@ extern struct __unitctest_ctx __ctx;
  *  Logs & co
  * -----------------------------------------------------------------------------
  */
+#ifdef __cplusplus
+
+#define typeof decltype
+
+#define __UNITCTEST_LOG_OPERAND(operand) std::cerr << operand;
+
+#define __UNITCTEST_LOG_NAMESPACE std::
+
+#else /* __cplusplus */
+
 #if (__STDC_VERSION__ >= 201112L)
+
 #define __UNITCTEST_LOG_FMT(x)                                                 \
 	_Generic((x),                                                          \
 	char: "%c",                                                            \
@@ -65,14 +82,26 @@ extern struct __unitctest_ctx __ctx;
 	char *: "%s",                                                          \
 	void *: "%p",                                                          \
 	default: "%p")
-#else
-#define __UNITCTEST_LOG_FMT(x) "%d"
+#else /* __STDC_VERSION__ >= 201112L */
+
 #define typeof __typeof__
+
+#define __UNITCTEST_LOG_FMT(x) "%d"
+
 #endif /* __STDC_VERSION__ >= 201112L */
 
-#define __UNITCTEST_LOG(...) fprintf(stdout, __VA_ARGS__);
+#define __UNITCTEST_LOG_OPERAND(operand)                                       \
+	__UNITCTEST_LOG_ERR(__UNITCTEST_LOG_FMT(operand), operand);
 
-#define __UNITCTEST_LOG_ERR(...) fprintf(stderr, __VA_ARGS__);
+#define __UNITCTEST_LOG_NAMESPACE
+
+#endif /* __cplusplus */
+
+#define __UNITCTEST_LOG(...)                                                   \
+	__UNITCTEST_LOG_NAMESPACE fprintf(stdout, __VA_ARGS__);
+
+#define __UNITCTEST_LOG_ERR(...)                                               \
+	__UNITCTEST_LOG_NAMESPACE fprintf(stderr, __VA_ARGS__);
 
 #define __UNITCTEST_LOG_TAP(...) __UNITCTEST_LOG(__VA_ARGS__);
 
@@ -88,7 +117,6 @@ extern struct __unitctest_ctx __ctx;
 	__UNITCTEST_LOG_TAP("ok %d - %s | %s # SKIP\n",                        \
 			    __ctx.current_test->id, __ctx.current_test->name,  \
 			    __ctx.current_test->desc);
-
 /* -----------------------------------------------------------------------------
  *  Asserts and Expects
  * -----------------------------------------------------------------------------
@@ -104,9 +132,9 @@ extern struct __unitctest_ctx __ctx;
 	if (__ctx.verbosity) {                                                 \
 		__UNITCTEST_LOG_ERR(" %s:%d -> ", __FILE__, __LINE__);         \
 		__UNITCTEST_LOG_ERR("%s(%s) failed (", type, #lhs #op #rhs);   \
-		__UNITCTEST_LOG_ERR(__UNITCTEST_LOG_FMT(lhs), lhs);            \
+		__UNITCTEST_LOG_OPERAND(lhs);                                  \
 		__UNITCTEST_LOG_ERR(" %s ", #op);                              \
-		__UNITCTEST_LOG_ERR(__UNITCTEST_LOG_FMT(rhs), rhs);            \
+		__UNITCTEST_LOG_OPERAND(rhs);                                  \
 		__UNITCTEST_LOG_ERR(") -> %s", strerr);                        \
 		__UNITCTEST_LOG_ERR("\n");                                     \
 	}

@@ -3,6 +3,7 @@
 <h1>unitctest</h1>
 
 ![Standard](https://img.shields.io/badge/C-99/11/14/17-blue.svg)
+![Standard](https://img.shields.io/badge/C++-11/14/17/20-blue.svg)
 ![License](https://img.shields.io/github/license/luizinhosuraty/unitctest)
 ![Lines of code](https://img.shields.io/tokei/lines/github/luizinhosuraty/unitctest?label=LoC-header)
 
@@ -57,9 +58,15 @@ Support for C++ is still under development.
 Language          | Version
 ----------------- | -----------------
 C                 | C99*, C11, C14, C17
-C++               | under development
+C++**             | C++1x, C++2x
 
 *There is a known small issue with logging (related to print type) 
+
+** Some caveats :
+ - Comparisons rely on '==' operator of operands;
+ - Compiler will signal errors if operand does not have '<<' implemented;
+ - Currently mixing cerr with fprintf to take advantage of '<<'.
+
 
 # Questions / FAQs
 
