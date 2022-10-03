@@ -18,9 +18,11 @@ ttest_depfiles = $(addprefix $(test_build_dir), $(targets:=.d))
 
 targets := assert_true_false\
 	   assert_int\
+	   cstrings\
 	   expect_true_false\
 	   expect_int\
 	   fixture\
+	   strings\
 	   test_skip\
 	   vectors
 

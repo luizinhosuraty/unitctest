@@ -17,6 +17,7 @@
 #else /* __cplusplus */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #endif /* __cplusplus */
 
 #include <getopt.h>
@@ -55,6 +56,8 @@ extern struct __unitctest_ctx __ctx;
 
 #define typeof decltype
 
+#define __UNITCTEST_STR_COMPARE(op, lhs, rhs) (lhs op rhs)
+
 #define __UNITCTEST_LOG_OPERAND(operand) std::cerr << operand;
 
 #define __UNITCTEST_LOG_NAMESPACE std::
@@ -89,6 +92,8 @@ extern struct __unitctest_ctx __ctx;
 #define __UNITCTEST_LOG_FMT(x) "%d"
 
 #endif /* __STDC_VERSION__ >= 201112L */
+
+#define __UNITCTEST_STR_COMPARE(op, lhs, rhs) (strcmp(lhs, rhs) op 0)
 
 #define __UNITCTEST_LOG_OPERAND(operand)                                       \
 	__UNITCTEST_LOG_ERR(__UNITCTEST_LOG_FMT(operand), operand);
@@ -164,6 +169,27 @@ extern struct __unitctest_ctx __ctx;
 		if (!(_lhs op _rhs)) {                                         \
 			__UNITCTEST_TEST_FAILED_INT("EXPECT_" strop, op, lhs,  \
 						    rhs, strerr);              \
+		}                                                              \
+	}
+
+#define __UNITCTEST_ASSERT_HELPER_STR(strop, op, lhs, rhs, strerr)             \
+	{                                                                      \
+		typeof(lhs) _lhs = lhs;                                        \
+		typeof(rhs) _rhs = rhs;                                        \
+		if (!(__UNITCTEST_STR_COMPARE(op, _lhs, _rhs))) {              \
+			__UNITCTEST_TEST_FAILED_INT("ASSERT_STR" strop, op,    \
+						    lhs, rhs, strerr);         \
+			return;                                                \
+		}                                                              \
+	}
+
+#define __UNITCTEST_EXPECT_HELPER_STR(strop, op, lhs, rhs, strerr)             \
+	{                                                                      \
+		typeof(lhs) _lhs = lhs;                                        \
+		typeof(rhs) _rhs = rhs;                                        \
+		if (!(__UNITCTEST_STR_COMPARE(op, _lhs, _rhs))) {              \
+			__UNITCTEST_TEST_FAILED_INT("EXPECT_STR" strop, op,    \
+						    lhs, rhs, strerr);         \
 		}                                                              \
 	}
 
@@ -246,6 +272,24 @@ extern struct __unitctest_ctx __ctx;
 	__UNITCTEST_EXPECT_HELPER_INT("LE", <=, lhs, rhs, strerr)
 
 /*
+ * @name EXPECT_STR_EQ
+ * @brief Checks whether strings lhs == rhs. Test continues even on fail.
+ * @param lhs - left hand-side operand (must be string)
+ * @param rhs - right hand-side operand (must be string)
+ */
+#define EXPECT_STR_EQ(lhs, rhs, strerr)                                        \
+	__UNITCTEST_EXPECT_HELPER_STR("EQ", ==, lhs, rhs, strerr)
+
+/*
+ * @name EXPECT_STR_NEQ
+ * @brief Checks whether strings lhs != rhs. Test continues even on fail.
+ * @param lhs - left hand-side operand (must be string)
+ * @param rhs - right hand-side operand (must be string)
+ */
+#define EXPECT_STR_NEQ(lhs, rhs, strerr)                                       \
+	__UNITCTEST_EXPECT_HELPER_STR("NEQ", !=, lhs, rhs, strerr)
+
+/*
  * @name ASSERT_TRUE
  * @brief Checks whether cond is true. Stop current test if condition is not true
  * @param cond - condition to be tested
@@ -323,6 +367,24 @@ extern struct __unitctest_ctx __ctx;
  */
 #define ASSERT_LE(lhs, rhs, strerr)                                            \
 	__UNITCTEST_ASSERT_HELPER_INT("LE", <=, lhs, rhs, strerr)
+
+/*
+ * @name ASSERT_STR_EQ
+ * @brief Checks whether strings lhs == rhs. Stop current test if not true
+ * @param lhs - left hand-side operand (must be string)
+ * @param rhs - right hand-side operand (must be string)
+ */
+#define ASSERT_STR_EQ(lhs, rhs, strerr)                                        \
+	__UNITCTEST_ASSERT_HELPER_STR("EQ", ==, lhs, rhs, strerr)
+
+/*
+ * @name ASSERT_STR_NEQ
+ * @brief Checks whether strings lhs != rhs. Stop current test if not true
+ * @param lhs - left hand-side operand (must be string)
+ * @param rhs - right hand-side operand (must be string)
+ */
+#define ASSERT_STR_NEQ(lhs, rhs, strerr)                                       \
+	__UNITCTEST_ASSERT_HELPER_STR("NEQ", !=, lhs, rhs, strerr)
 
 /* -----------------------------------------------------------------------------
  *  Test Definition
