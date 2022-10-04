@@ -56,6 +56,8 @@ extern struct __unitctest_ctx __ctx;
 
 #define typeof decltype
 
+#define __UNITCTEST_NULL (void *)nullptr
+
 #define __UNITCTEST_STR_COMPARE(op, lhs, rhs) (lhs op rhs)
 
 #define __UNITCTEST_LOG_OPERAND(operand) std::cerr << operand;
@@ -92,6 +94,8 @@ extern struct __unitctest_ctx __ctx;
 #define __UNITCTEST_LOG_FMT(x) "%d"
 
 #endif /* __STDC_VERSION__ >= 201112L */
+
+#define __UNITCTEST_NULL NULL
 
 #define __UNITCTEST_STR_COMPARE(op, lhs, rhs) (strcmp(lhs, rhs) op 0)
 
@@ -290,6 +294,14 @@ extern struct __unitctest_ctx __ctx;
 	__UNITCTEST_EXPECT_HELPER_STR("NEQ", !=, lhs, rhs, strerr)
 
 /*
+ * @name EXPECT_NULL
+ * @brief Checks whether lhs == NULL. Test continues even on fail.
+ * @param lhs - left hand-side operand (must be pointer)
+ */
+#define EXPECT_NULL(lhs, strerr)                                               \
+	__UNITCTEST_EXPECT_HELPER_INT("NULL", ==, lhs, __UNITCTEST_NULL, strerr)
+
+/*
  * @name ASSERT_TRUE
  * @brief Checks whether cond is true. Stop current test if condition is not true
  * @param cond - condition to be tested
@@ -385,6 +397,14 @@ extern struct __unitctest_ctx __ctx;
  */
 #define ASSERT_STR_NEQ(lhs, rhs, strerr)                                       \
 	__UNITCTEST_ASSERT_HELPER_STR("NEQ", !=, lhs, rhs, strerr)
+
+/*
+ * @name ASSERT_NULL
+ * @brief Checks whether lhs == NULL. Stop current test if condition is not true
+ * @param lhs - left hand-side operand (must be pointer)
+ */
+#define ASSERT_NULL(lhs, strerr)                                               \
+	__UNITCTEST_ASSERT_HELPER_INT("NULL", ==, lhs, __UNITCTEST_NULL, strerr)
 
 /* -----------------------------------------------------------------------------
  *  Test Definition

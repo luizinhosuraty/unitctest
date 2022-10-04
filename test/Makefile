@@ -22,6 +22,8 @@ targets := assert_true_false\
 	   expect_true_false\
 	   expect_int\
 	   fixture\
+	   null\
+	   nullptr\
 	   strings\
 	   test_skip\
 	   vectors
