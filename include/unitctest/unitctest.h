@@ -42,6 +42,7 @@ struct __unitctest_test {
 struct __unitctest_ctx {
 	unsigned int nbr;
 	unsigned int verbosity;
+	enum __unitctest_test_result result;
 	struct __unitctest_test *tests;
 	struct __unitctest_test *current_test;
 };
@@ -536,6 +537,7 @@ static inline void __unitctest_log_result(void)
 		__UNITCTEST_LOG_TAP_SUCCEED();
 		break;
 	case TEST_FAILED:
+		__ctx.result = TEST_FAILED;
 		/* TAP log occurs during failed expect/assert */
 		break;
 	case TEST_SKIPPED:
@@ -585,12 +587,13 @@ static int __unitctest_fini(void)
 }
 
 #define TEST_MAIN()                                                            \
-	struct __unitctest_ctx __ctx = { 0, 0, NULL, NULL };                   \
+	struct __unitctest_ctx __ctx = { 0, 0, TEST_SUCCEED, NULL, NULL };     \
 	int main(int argc, char **argv)                                        \
 	{                                                                      \
 		__unitctest_init(argc, argv);                                  \
 		__unitctest_run();                                             \
 		__unitctest_fini();                                            \
+		return (__ctx.result);                                         \
 	}
 
 #endif /* _UNITCTEST_H */
