@@ -56,6 +56,6 @@ clean:
 .PHONY: test
 test: $(targets)
 	@printf $(KBLUE)"---- running tests ----\n"$(KNORM)
-	@for f in $^ ; do echo $$f; ./$$f.test ; done
+	@r=0; for f in $^ ; do echo $$f; ./$$f.test ; r=$$((r+$$?)) ; done; exit $$r
 
 -include $(test_depfiles)
