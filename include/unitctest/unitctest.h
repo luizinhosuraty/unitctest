@@ -42,6 +42,7 @@ struct __unitctest_test {
 struct __unitctest_ctx {
 	unsigned int nbr;
 	unsigned int verbosity;
+	unsigned int list_only;
 	enum __unitctest_test_result result;
 	struct __unitctest_test *tests;
 	struct __unitctest_test *current_test;
@@ -114,6 +115,11 @@ extern struct __unitctest_ctx __ctx;
 	__UNITCTEST_LOG_NAMESPACE fprintf(stderr, __VA_ARGS__);
 
 #define __UNITCTEST_LOG_TAP(...) __UNITCTEST_LOG(__VA_ARGS__);
+
+#define __UNITCTEST_LOG_TAP_LIST()                                             \
+	__UNITCTEST_LOG_TAP("%d - %s | %s \n", __ctx.current_test->id,         \
+			    __ctx.current_test->name,                          \
+			    __ctx.current_test->desc);
 
 #define __UNITCTEST_LOG_TAP_SUCCEED()                                          \
 	__UNITCTEST_LOG_TAP("ok %d - %s | %s \n", __ctx.current_test->id,      \
@@ -525,8 +531,9 @@ extern struct __unitctest_ctx __ctx;
 static inline void __unitctest_log_usage(FILE *fd, int argc, char **argv)
 {
 	(void)argc;
-	fprintf(fd, "Usage : %s [-h] [-v]\n", argv[0]);
+	fprintf(fd, "Usage : %s [-h] [-l] [-v]\n", argv[0]);
 	fprintf(fd, " \t -h display this help message\n");
+	fprintf(fd, " \t -l list all executable tests\n");
 	fprintf(fd, " \t -v run tests on verbose mode\n");
 }
 
@@ -549,15 +556,27 @@ static inline void __unitctest_log_result(void)
 	}
 }
 
+static inline void __unitctest_log_test_list(void)
+{
+	__UNITCTEST_LOG("# -  name  |  description \n\n");
+	for (unsigned int i = 0; i < __ctx.nbr; i++) {
+		__ctx.current_test = &__ctx.tests[i];
+		__UNITCTEST_LOG_TAP_LIST();
+	}
+}
+
 static int __unitctest_init(int argc, char **argv)
 {
 	int op;
 
-	while ((op = getopt(argc, argv, "hv")) != -1) {
+	while ((op = getopt(argc, argv, "hlv")) != -1) {
 		switch (op) {
 		case 'h':
 			__unitctest_log_usage(stdout, argc, argv);
 			exit(0);
+		case 'l':
+			__ctx.list_only = 1;
+			break;
 		case 'v':
 			__ctx.verbosity = 1;
 			break;
@@ -566,12 +585,16 @@ static int __unitctest_init(int argc, char **argv)
 			exit(-1);
 		}
 	}
-	__UNITCTEST_LOG_TAP("1..%d\n", __ctx.nbr);
 	return 0;
 }
 
 static int __unitctest_run(void)
 {
+	if (__ctx.list_only) {
+		__unitctest_log_test_list();
+		return 0;
+	}
+	__UNITCTEST_LOG_TAP("1..%d\n", __ctx.nbr);
 	for (unsigned int i = 0; i < __ctx.nbr; i++) {
 		__ctx.current_test = &__ctx.tests[i];
 		__ctx.current_test->func();
@@ -587,7 +610,7 @@ static int __unitctest_fini(void)
 }
 
 #define TEST_MAIN()                                                            \
-	struct __unitctest_ctx __ctx = { 0, 0, TEST_SUCCEED, NULL, NULL };     \
+	struct __unitctest_ctx __ctx = { 0, 0, 0, TEST_SUCCEED, NULL, NULL };  \
 	int main(int argc, char **argv)                                        \
 	{                                                                      \
 		__unitctest_init(argc, argv);                                  \
