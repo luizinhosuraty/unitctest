@@ -521,6 +521,14 @@ extern struct __unitctest_ctx __ctx;
  *  Functions to control/run the test suite
  * -----------------------------------------------------------------------------
  */
+static inline void __unitctest_log_usage(FILE *fd, int argc, char **argv)
+{
+	(void)argc;
+	fprintf(fd, "Usage : %s [-h] [-v]\n", argv[0]);
+	fprintf(fd, " \t -h display this help message\n");
+	fprintf(fd, " \t -v run tests on verbose mode\n");
+}
+
 static inline void __unitctest_log_result(void)
 {
 	switch (__ctx.current_test->result) {
@@ -541,17 +549,19 @@ static inline void __unitctest_log_result(void)
 
 static int __unitctest_init(int argc, char **argv)
 {
-	(void)argc;
-	(void)argv;
 	int op;
 
-	while ((op = getopt(argc, argv, "v")) != -1) {
+	while ((op = getopt(argc, argv, "hv")) != -1) {
 		switch (op) {
+		case 'h':
+			__unitctest_log_usage(stdout, argc, argv);
+			exit(0);
 		case 'v':
 			__ctx.verbosity = 1;
 			break;
 		default:
-			abort();
+			__unitctest_log_usage(stderr, argc, argv);
+			exit(-1);
 		}
 	}
 	__UNITCTEST_LOG_TAP("1..%d\n", __ctx.nbr);
