@@ -108,11 +108,12 @@ extern struct __unitctest_ctx __ctx;
 
 #endif /* __cplusplus */
 
-#define __UNITCTEST_LOG(...)                                                   \
-	__UNITCTEST_LOG_NAMESPACE fprintf(stdout, __VA_ARGS__);
+#define __UNITCTEST_LOG_FILE(f, ...)                                           \
+	__UNITCTEST_LOG_NAMESPACE fprintf(f, __VA_ARGS__);
 
-#define __UNITCTEST_LOG_ERR(...)                                               \
-	__UNITCTEST_LOG_NAMESPACE fprintf(stderr, __VA_ARGS__);
+#define __UNITCTEST_LOG(...) __UNITCTEST_LOG_FILE(stdout, __VA_ARGS__);
+
+#define __UNITCTEST_LOG_ERR(...) __UNITCTEST_LOG_FILE(stderr, __VA_ARGS__);
 
 #define __UNITCTEST_LOG_TAP(...) __UNITCTEST_LOG(__VA_ARGS__);
 
@@ -531,10 +532,10 @@ extern struct __unitctest_ctx __ctx;
 static inline void __unitctest_log_usage(FILE *fd, int argc, char **argv)
 {
 	(void)argc;
-	fprintf(fd, "Usage : %s [-h] [-l] [-v]\n", argv[0]);
-	fprintf(fd, " \t -h display this help message\n");
-	fprintf(fd, " \t -l list all executable tests\n");
-	fprintf(fd, " \t -v run tests on verbose mode\n");
+	__UNITCTEST_LOG_FILE(fd, "Usage : %s [-h] [-l] [-v]\n", argv[0]);
+	__UNITCTEST_LOG_FILE(fd, " \t -h display this help message\n");
+	__UNITCTEST_LOG_FILE(fd, " \t -l list all executable tests\n");
+	__UNITCTEST_LOG_FILE(fd, " \t -v run tests on verbose mode\n");
 }
 
 static inline void __unitctest_log_result(void)
@@ -551,7 +552,7 @@ static inline void __unitctest_log_result(void)
 		__UNITCTEST_LOG_TAP_SKIPPED();
 		break;
 	default:
-		fprintf(stderr, "Unknown error\n");
+		__UNITCTEST_LOG_ERR("Unknown error\n");
 		break;
 	}
 }
