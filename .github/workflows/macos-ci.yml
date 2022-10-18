@@ -1,0 +1,22 @@
+name: "macOS CI"
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    # once every weekend
+    - cron: '0 3 * * 6'
+    
+jobs:
+  build:
+    runs-on: macos-latest
+    name: "MacOS CI"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Build & Test
+        working-directory: test/
+        run: make test
