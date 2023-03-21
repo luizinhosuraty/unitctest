@@ -17,6 +17,7 @@
 #else /* __cplusplus */
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #endif /* __cplusplus */
 
@@ -88,6 +89,7 @@ extern struct __unitctest_ctx __ctx;
 	long double: "%Lf",                                                    \
 	char *: "%s",                                                          \
 	void *: "%p",                                                          \
+	bool: "%d",                                                            \
 	default: "%p")
 #else /* __STDC_VERSION__ >= 201112L */
 
